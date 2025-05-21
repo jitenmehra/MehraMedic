@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MEHRAS - Drug Inventory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background: #f9f9f9;
+  }
+
+  h1 {
+    margin: 5 auto;
+    text-align: center;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    font-size: 1.8rem;
+    color: #8B0000;
+  }
+
+  .header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .logo {
+    width: 60px;
+    height: 60px;
+    left: 10px;
+    position: absolute;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .controls input[type="text"] {
+    padding: 10px 14px;
+    font-size: 1rem;
+    flex: 1 1 300px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    max-width: 400px;
+  }
+
+  .controls button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 20px;
+    background-color: #8B0000;
+    color: white;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: auto;
+  }
+
+  .controls button:hover {
+    background-color: #0056b3;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .card img {
+    max-width: 100px;
+    height: auto;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+  }
+
+  .field-label {
+    font-weight: bold;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .med-row {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin: 10px 0;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .med-row:hover {
+    background: #f9f9f9;
+  }
+
+  .med-primary {
+    font-weight: bold;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .med-secondary {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  .med-details {
+    padding: 8px 10px;
+    background: #fafafa;
+    border-top: 1px solid #eee;
+    margin-top: 8px;
+    font-size: 14px;
+    display: none;
+  }
+
+  .expand-icon {
+    margin-right: 10px;
+    font-size: 14px;
+    user-select: none;
+  }
+
+  .collapsible-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    margin: 1rem 0;
+    overflow: hidden;
+    background: white;
+  }
+
+  .collapsible-header {
+    padding: 12px;
+    background: #f9f9f9;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .collapsible-header .toggle-icon {
+    margin-right: 10px;
+  }
+
+  .secondary-line {
+    color: gray;
+    font-size: 0.9em;
+    padding: 0 12px 12px 12px; /* Added padding to align with header */
+  }
+
+  .collapsible-details {
+    padding: 10px 16px;
+    background-color: #fff;
+  }
+
+  .detail-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .detail-table td {
+    padding: 4px 8px;
+    vertical-align: top;
+  }
+
+  .detail-table tr:nth-child(odd) {
+    background-color: #f3f3f3;
+  }
+
+  /* Form container */
+  #medicineFormContainer {
+    background: #ffffff;
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 1.5rem auto;
+    display: none;
+  }
+
+  #medicineFormContainer h2 {
+    text-align: center;
+    color: #8B0000;
+    font-size: 1.4rem;
+    margin-bottom: 1.4rem;
+  }
+
+  #medicineForm label {
+    font-weight: bold;
+    display: block;
+    margin: 10px 0 4px;
+    font-size: 0.95rem;
+  }
+  
+  #medicineForm input[list] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  background: white;
+  box-sizing: border-box;
+  }
+
+
+  #medicineForm input[type="text"],
+  #medicineForm input[type="file"],
+  #medicineForm select,
+  #medicineForm textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 1rem;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    resize: vertical;
+    box-sizing: border-box;
+  }
+
+  #medicineForm input[type="file"] {
+  padding: 4px 12px; /* less padding for file input */
+  }
+  
+  #medicineForm button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 20px;
+    background-color: #8B0000;
+    color: white;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: background 0.2s ease;
+    width: auto;
+  }
+
+  #medicineForm button:hover {
+    background-color: #0056b3;
+  }
+  
+  #medicineForm select,
+  #medicineForm .choices__inner {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+  background: white;
+}
+
+  #medicineForm .choices__list--dropdown {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  border: 1px solid #ccc;
+}
+  
+  .custom-file-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#customFileButton {
+  background-color: #00897b;
+  color: white;
+  border: none;
+  padding: 0px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+  
+  #customFileButton:hover {
+  background-color: #0056b3;
+}
+
+#fileNameDisplay {
+  font-size: 0.9em;
+  color: #555;
+}
+
+  .form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+  
+  .details-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .edit-btn, .delete-btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    width: auto;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .edit-btn {
+    background-color: #8B0000;
+  }
+
+  .edit-btn:hover {
+    background-color: #0056b3;
+  }
+
+  .delete-btn {
+    background-color: #c0392b;
+  }
+
+  .delete-btn:hover {
+    background-color: #a93226;
+  }
+
+  .preview-image {
+    max-width: 150px;
+    margin-top: 10px;
+    border-radius: 8px;
+    display: none;
+  }
+
+  @media (max-width: 580px) {
+    .controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .controls input[type="text"] {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+
+    .controls button {
+      width: auto;
+      align-self: flex-start;
+    }
+
+    .details-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #medicineFormContainer {
+      padding: 1rem;
+    }
+    
+    #medicineForm button,
+     .edit-btn, .delete-btn {
+      max-width: 100%; /* Allow buttons to fill container but no overflow */
+    }
+  }
+</style>
+
+
+</head>
+<body>
+
+  <div class="header-container">
+  <img src="https://cdn-icons-png.flaticon.com/512/1529/1529570.png" class="logo">
+     <div class="spacer"></div>
+    <h1>MEHRA MEDIC</h1>
+     <div class="spacer"></div>
+  </div>
+
+  <hr style="width: 100%; border: 1px solid #ccc; border-radius: 4px; margin: 1rem auto;">
+  
+<div class="controls">
+  <input type="text" id="searchInput" placeholder="Search by name, symptoms, notes...">
+  <button onclick="filterByExpiry()">Filter by Expiry</button>
+  <button onclick="resetFilters()">Reset</button>
+  <button onclick="showForm()">Add New</button>
+</div>
+
+  <hr style="width: 90%; border: 1px solid #ccc; border-radius: 4px; margin: 1rem auto;">
+  
+<div id="medicineList">Loading...</div>
+
+<div id="medicineFormContainer">
+  <h2 id="formTitle">Add New Medicine</h2>
+
+  <form id="medicineForm">
+    <div class="form-group">
+      <label for="nameInput">Name & Brand (if necessary)*</label>
+      <input type="text" id="nameInput" name="Name of medicine" placeholder="e.g. R6 | Dr Reckeweg" required />
+    </div>
+
+    <div class="form-group">
+      <label for="medicineType">Medicine Type</label>
+      <select id="medicineType" name="Type of medicine" required>
+        <option value="" disabled selected>Select medicine type</option>
+        <option value="Tablet">Allopathic</option>
+        <option value="Capsule">Antibiotic</option>
+        <option value="Syrup">Homeopathic</option>
+        <option value="Injection">Vitality</option>
+        <option value="Ointment">Vitamins</option>
+        <option value="Drops">Supplements</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="dosageAdultsInput">Dosage Adults</label>
+      <input type="text" id="dosageAdultsInput" name="Dosage Adults" />
+    </div>
+
+    <div class="form-group">
+      <label for="dosageChildrenInput">Dosage Children</label>
+      <input type="text" id="dosageChildrenInput" name="Dosage Children" />
+    </div>
+
+    <div class="form-group">
+      <label for="quantityInput">Quantity (with Expiry)</label>
+      <input
+        type="text"
+        id="quantityInput"
+        name="Quantity (with Expiry)"
+        placeholder="e.g. 10 (12-Mar-25); 5 (01-Apr-25)"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="notesInput">Notes</label>
+      <textarea id="notesInput" name="Notes"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="symptomsInput">Symptoms</label>
+      <input
+        list="symptomList"
+        id="symptomsInput"
+        name="Symptoms"
+        placeholder="Select or enter symptoms"
+        autocomplete="off"
+      />
+      <datalist id="symptomList">
+        <!-- Options dynamically loaded by JS -->
+      </datalist>
+    </div>
+
+   <div class="form-group">
+  <label for="medicineImage">Upload Image</label>
+  <div class="custom-file-wrapper">
+    <button type="button" id="customFileButton">📷</button>
+    <span id="fileNameDisplay">No file chosen</span>
+    <input 
+      type="file" 
+      id="medicineImage" 
+      name="medicineImage" 
+      accept="image/*" 
+      style="display: none;" 
+      capture="environment"
+    >
+  </div>
+</div>
+    
+
+    <div id="medicineFormButtons">
+      <button type="submit" id="saveBtn">Save</button>
+      <button type="button" class="cancel-btn" onclick="hideForm()">
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+
+  <!-- Hidden field to store image data URL -->
+<input type="hidden" id="imageUrlInput" name="Image URL" value="" />
+
+<!-- Image preview -->
+<img id="imagePreview" src="" style="display: none; max-height: 150px; margin-top: 10px;" />
+  
+<script>
+    const sheetURL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vRqTsbsJ3gPVSOyMbm81kzZKguaw9TasKJz7h8vBE30FsAsmmqyGvNuAUIwASLY-C4-apURuvnZsCkQ/pub?output=csv";
+    const apiUrl = "https://script.google.com/macros/s/AKfycbzhRxuQ3Du6KLyBrDJrgqnxIBKC4knYr17zZJNP_9v9N7H0SilHCR4tA8ovwIlcUQYntA/exec"; // <-- Replace with your actual deployed API URL
+
+    let allRecords = [];
+    let editIndex = null; // Track editing record index
+    let existingSymptoms = [];
+
+    async function fetchSheetData() {
+      try {
+        const response = await fetch(sheetURL);
+        const csv = await response.text();
+        const rows = csv.split("\n").map((r) => r.split(","));
+        const headers = rows[0];
+        const data = rows.slice(1).map((row) => {
+          let obj = {};
+          headers.forEach((h, i) => (obj[h.trim()] = row[i]?.trim()));
+          return obj;
+        });
+        allRecords = data.filter((r) => r["Name of medicine"]);
+        displayRecords(allRecords);
+      } catch (err) {
+        document.getElementById("medicineList").innerHTML = 
+          `<p>Error loading data: ${err.message}. Please try refreshing the page.</p>`;
+      }
+    }
+
+    function displayRecords(records) {
+      const container = document.getElementById("medicineList");
+      if (!records.length) {
+        container.innerHTML = "<p>No medicines found.</p>";
+        return;
+      }
+      container.innerHTML = "";
+      records.forEach((rec, i) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "collapsible-wrapper";
+
+        // Header with toggle icon and medicine name
+        const header = document.createElement("div");
+        header.className = "collapsible-header";
+        header.innerHTML = `<span class="toggle-icon">►</span>${rec["Name of medicine"] || ""}`;
+        wrapper.appendChild(header);
+
+        // Secondary line showing type and quantity
+        const secLine = document.createElement("div");
+        secLine.className = "secondary-line";
+        secLine.textContent = `${rec["Type of medicine"] || ""} — Qty: ${rec["Quantity (with Expiry)"] || ""}`;
+        wrapper.appendChild(secLine);
+
+        // Details section hidden by default
+        const details = document.createElement("div");
+        details.className = "collapsible-details";
+        details.style.display = "none";
+
+        const detailsTable = document.createElement("table");
+        detailsTable.className = "detail-table";
+        detailsTable.innerHTML = `
+          <tr><td>Dosage Adults</td><td>${rec["Dosage Adults"] || ""}</td></tr>
+          <tr><td>Dosage Children</td><td>${rec["Dosage Children"] || ""}</td></tr>
+          <tr><td>Notes</td><td>${rec["Notes"] || ""}</td></tr>
+          <tr><td>Symptoms</td><td>${rec["Symptoms"] || ""}</td></tr>
+          <tr><td>Image</td><td>${rec["Image URL"] ? `<img src="${rec["Image URL"]}" alt="Medicine image" style="max-width:100px; max-height:100px; border-radius: 8px;">` : "No image"}</td></tr>
+        `;
+        details.appendChild(detailsTable);
+
+        // Edit/Delete buttons
+        const actions = document.createElement("div");
+        actions.className = "details-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.className = "edit-btn";
+        editBtn.onclick = () => {
+          openEditForm(i);
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.className = "delete-btn";
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation(); // Prevent the collapsible from toggling
+          if (confirm(`Are you sure you want to delete "${rec["Name of medicine"]}"?`)) {
+            deleteRecord(rec["Name of medicine"]);
+          }
+        };
+
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        details.appendChild(actions);
+
+        wrapper.appendChild(details);
+
+        // Toggle details on header click
+        header.addEventListener("click", () => {
+          const icon = header.querySelector(".toggle-icon");
+          if (details.style.display === "none") {
+            details.style.display = "block";
+            icon.textContent = "▼";
+          } else {
+            details.style.display = "none";
+            icon.textContent = "►";
+          }
+        });
+
+        container.appendChild(wrapper);
+      });
+    }
+
+    // Load symptoms for datalist
+    function loadSymptoms() {
+      fetch(`${apiUrl}?action=getKeywords`)
+        .then(res => res.json())
+        .then(data => {
+          existingSymptoms = data.keywords || [];
+          const datalist = document.getElementById("symptomList");
+          datalist.innerHTML = "";
+          existingSymptoms.forEach(symptom => {
+            const option = document.createElement("option");
+            option.value = symptom;
+            datalist.appendChild(option);
+          });
+        })
+        .catch(err => {
+          console.error("Failed to load symptoms:", err);
+        });
+    }
+
+    // Show form for adding new medicine
+    function showForm() {
+      editIndex = null;
+      document.getElementById("formTitle").textContent = "Add New Medicine";
+      document.getElementById("medicineForm").reset();
+      document.getElementById("imagePreview").style.display = "none";
+      document.getElementById("medicineFormContainer").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Hide form
+    function hideForm() {
+      document.getElementById("medicineFormContainer").style.display = "none";
+    }
+
+    // Handle image preview
+    document.getElementById("medicineImage").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const preview = document.getElementById("imagePreview");
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+          // In a real app, you'd upload this image to a server and get back a URL
+          // For now, we'll just use the data URL as a placeholder
+          document.getElementById("imageUrlInput").value = e.target.result;
+        };
+        
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Open form with data for editing
+    function openEditForm(index) {
+      editIndex = index;
+      const rec = allRecords[index];
+      document.getElementById("formTitle").textContent = `Edit Medicine: ${rec["Name of medicine"]}`;
+      document.getElementById("nameInput").value = rec["Name of medicine"] || "";
+      
+      // Set medicine type select value
+      const typeSelect = document.getElementById("medicineType");
+      for(let i = 0; i < typeSelect.options.length; i++) {
+        if(typeSelect.options[i].value === rec["Type of medicine"]) {
+          typeSelect.selectedIndex = i;
+          break;
+        }
+      }
+      
+      document.getElementById("dosageAdultsInput").value = rec["Dosage Adults"] || "";
+      document.getElementById("dosageChildrenInput").value = rec["Dosage Children"] || "";
+      document.getElementById("quantityInput").value = rec["Quantity (with Expiry)"] || "";
+      document.getElementById("notesInput").value = rec["Notes"] || "";
+      document.getElementById("symptomsInput").value = rec["Symptoms"] || "";
+      document.getElementById("imageUrlInput").value = rec["Image URL"] || "";
+      
+      // Show image preview if available
+      const preview = document.getElementById("imagePreview");
+      if (rec["Image URL"]) {
+        preview.src = rec["Image URL"];
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+      
+      document.getElementById("medicineFormContainer").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Form submit handler for add/edit
+    document.getElementById("medicineForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      // Check if a new symptom was entered
+      const symptomInput = document.getElementById("symptomsInput");
+      const enteredSymptom = symptomInput.value.trim();
+      
+      if (enteredSymptom && !existingSymptoms.includes(enteredSymptom)) {
+        if (confirm(`"${enteredSymptom}" is not in the existing symptoms list. Do you want to add it?`)) {
+          try {
+            const response = await fetch(apiUrl, {
+              method: 'POST',
+              body: JSON.stringify({
+                action: 'addKeyword',
+                keyword: enteredSymptom
+              }),
+              headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            existingSymptoms.push(enteredSymptom);
+            const option = document.createElement("option");
+            option.value = enteredSymptom;
+            document.getElementById("symptomList").appendChild(option);
+          } catch (err) {
+            alert('Failed to add new symptom. Please try again.');
+            return;
+          }
+        }
+      }
+      
+      // Process form submission
+      const formData = new FormData(e.target);
+      let dataObj = {};
+      formData.forEach((v, k) => {
+        dataObj[k] = v.toString().trim();
+      });
+
+      if (!dataObj["Name of medicine"]) {
+        alert("Name of medicine is required.");
+        return;
+      }
+
+      // If editing, keep original name for identification
+      if (editIndex !== null) {
+        dataObj._originalName = allRecords[editIndex]["Name of medicine"];
+      }
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataObj),
+        });
+        const text = await response.text();
+        if (text.toLowerCase().includes("success")) {
+          alert("Record saved successfully.");
+          hideForm();
+          fetchSheetData();
+        } else {
+          alert("Error saving record: " + text);
+        }
+      } catch (err) {
+        alert("Network error: " + err.message);
+      }
+    });
+
+    // Delete a record by name
+    async function deleteRecord(name) {
+      if (!name) return;
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ "Name of medicine": name, _delete: true }),
+        });
+        const text = await response.text();
+        if (text.toLowerCase().includes("success")) {
+          alert("Record deleted successfully.");
+          fetchSheetData();
+        } else {
+          alert("Error deleting record: " + text);
+        }
+      } catch (err) {
+        alert("Network error: " + err.message);
+      }
+    }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileButton = document.getElementById("customFileButton");
+    const fileInput = document.getElementById("medicineImage");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+    if (fileButton && fileInput && fileNameDisplay) {
+      fileButton.addEventListener("click", () => {
+        fileInput.click(); // Triggers hidden file input
+      });
+
+      fileInput.addEventListener("change", () => {
+        const file = fileInput.files[0];
+        fileNameDisplay.textContent = file ? file.name : "No file chosen";
+      });
+    } else {
+      console.error("File upload elements not found.");
+    }
+  });
+  
+    // Search input filter
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const val = this.value.trim().toLowerCase();
+      const filtered = allRecords.filter((r) => {
+        return (
+          (r["Name of medicine"] && r["Name of medicine"].toLowerCase().includes(val)) ||
+          (r["Symptoms"] && r["Symptoms"].toLowerCase().includes(val)) ||
+          (r["Notes"] && r["Notes"].toLowerCase().includes(val))
+        );
+      });
+      displayRecords(filtered);
+    });
+
+    // Expiry filter
+    function filterByExpiry() {
+      const now = new Date();
+      const filtered = allRecords.filter((r) => {
+        const qty = r["Quantity (with Expiry)"];
+        if (!qty) return false;
+        const matches = [...qty.matchAll(/\((\d{1,2}-[A-Za-z]{3}-\d{2,4})\)/g)];
+        if (matches.length === 0) return false;
+        return matches.some((m) => {
+          const d = new Date(m[1]);
+          return d < now;
+        });
+      });
+      displayRecords(filtered);
+    }
+
+    // Reset filter & search
+    function resetFilters() {
+      document.getElementById("searchInput").value = "";
+      displayRecords(allRecords);
+    }
+
+    // Initialize
+    fetchSheetData();
+    loadSymptoms();
+  </script>
+
+</body>
+</html>
