@@ -729,6 +729,7 @@
           try {
             const response = await fetch(apiUrl, {
               method: 'POST',
+              mode: 'cors',
               body: JSON.stringify({
                 action: 'addKeyword',
                 keyword: enteredSymptom
@@ -767,6 +768,7 @@
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
+          mode: 'cors',
           headers: {
             "Content-Type": "application/json",
           },
@@ -791,6 +793,7 @@
       try {
         const response = await fetch(apiUrl, {
           method: "POST",
+          mode: 'cors',
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ "Name of medicine": name, _delete: true }),
         });
